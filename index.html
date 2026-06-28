@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="description" content="Premium interactive neurology learning experience — Neurology Masterclass 2025 by Gigi El Ghazali.">
+  <meta name="theme-color" content="#09090B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Neurology Masterclass 2025</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+
+  <!-- ═══ Loading Screen ═══ -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="loading-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
+    </div>
+    <div class="loading-text">Loading Neurology Masterclass...</div>
+    <div class="loading-bar">
+      <div class="loading-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- ═══ App Layout ═══ -->
+  <div class="app">
+
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Brand -->
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="sidebar-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
+          </div>
+          <div>
+            <div class="sidebar-title">Neurology</div>
+            <div class="sidebar-subtitle">Masterclass 2025</div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+          <input type="text" class="search-input" id="sidebar-search" placeholder="Search topics..." readonly>
+          <span class="search-shortcut">⌘K</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <button class="nav-item" id="nav-all-topics">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12H20M4 6H20M4 18H20"/></svg>
+          <span>All Topics</span>
+          <span class="nav-badge" id="topics-count">16</span>
+        </button>
+        <button class="nav-item" id="nav-bookmarks">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
+          <span>Bookmarks</span>
+        </button>
+        <button class="nav-item" id="nav-flashcards">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+          <span>Flashcards</span>
+        </button>
+        <button class="nav-item" id="nav-quiz">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+          <span>Quiz Mode</span>
+        </button>
+        <button class="nav-item" id="nav-progress">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+          <span>Progress</span>
+        </button>
+      </nav>
+
+      <!-- Topics -->
+      <div class="sidebar-topics-header">Topics</div>
+      <div class="sidebar-topics" id="topics-list">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar" id="user-avatar">G</div>
+          <div>
+            <div class="user-name" id="user-name">Gigi El Ghazali</div>
+            <div class="user-role" id="user-role">Masterclass Student</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══ Main Area ═══ -->
+    <main class="main">
+
+      <!-- ═══ Floating Toolbar ═══ -->
+      <div class="floating-toolbar" id="floating-toolbar">
+        <!-- Sidebar Toggle -->
+        <button class="toolbar-btn" id="sidebar-toggle" title="Toggle Sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
+        <!-- Dark / Light Mode Toggle -->
+        <button class="toolbar-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+          <!-- Moon (shown in dark mode) -->
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <!-- Sun (shown in light mode) -->
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+      </div>
+
+      <!-- ═══ Illustration Viewport ═══ -->
+      <section class="viewport-section">
+        <div class="viewport-illustration-container" id="illustration-container">
+          <img id="hero-illustration" src="" alt="Medical Illustration" title="Click to expand">
+          <div class="illustration-placeholder" id="illustration-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="placeholder-icon"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+            <span>Awaiting premium illustration...</span>
+          </div>
+          <!-- Expand hint -->
+          <div class="expand-hint" id="expand-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            <span>Tap to expand</span>
+          </div>
+        </div>
+
+        <!-- Header overlay — fades on scroll -->
+        <div class="viewport-header" id="viewport-header">
+          <div class="viewport-header-pill">
+            <h1 class="viewport-topic-title" id="viewport-title">1. CVA (Cerebrovascular Accident / Ischemic Stroke &amp; TIA)</h1>
+            <p class="viewport-topic-subtitle" id="viewport-subtitle">Ischemic stroke occurs when a blood clot blocks blood flow to a part of the brain.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ Content Section ═══ -->
+      <section class="content-section">
+
+        <!-- Single "Content" tab + actions -->
+        <div class="content-tabs">
+          <button class="content-tab active" id="tab-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path></svg>
+            Content
+          </button>
+          <div class="content-tab-actions">
+            <button class="bookmark-btn" id="bookmark-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
+              <span class="bookmark-label">Bookmark</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="content-progress">
+          <div class="content-progress-fill" id="progress-fill"></div>
+        </div>
+
+        <!-- Content Body -->
+        <div class="content-body" id="content-body">
+          <div class="content-inner" id="content-inner">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══ Image Lightbox ═══ -->
+  <div class="lightbox-overlay" id="lightbox-overlay">
+    <button class="lightbox-close" id="lightbox-close">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="Full view">
+  </div>
+
+  <!-- ═══ Search Overlay ═══ -->
+  <div class="search-overlay" id="search-overlay">
+    <div class="search-modal">
+      <div class="search-modal-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted); flex-shrink: 0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input type="text" class="search-modal-input" id="search-modal-input" placeholder="Search all topics...">
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Flashcard Overlay ═══ -->
+  <div class="flashcard-overlay" id="flashcard-overlay">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <button class="close-btn" id="flashcard-close" style="align-self: flex-end; margin-bottom: 16px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+      <div class="flashcard-container">
+        <div class="flashcard" id="flashcard">
+          <div class="flashcard-front">
+            <div class="flashcard-category" id="flashcard-category">Category</div>
+            <div class="flashcard-question" id="flashcard-question">Question</div>
+            <div class="flashcard-hint">Tap to reveal answer</div>
+          </div>
+          <div class="flashcard-back">
+            <div class="flashcard-category">Answer</div>
+            <div class="flashcard-answer" id="flashcard-answer">Answer text</div>
+            <div class="flashcard-hint">Tap to flip back</div>
+          </div>
+        </div>
+      </div>
+      <div class="flashcard-nav">
+        <button class="flashcard-nav-btn" id="flashcard-prev">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <span class="flashcard-counter" id="flashcard-counter">1 / 10</span>
+        <button class="flashcard-nav-btn" id="flashcard-next">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Quiz Overlay ═══ -->
+  <div class="quiz-overlay" id="quiz-overlay">
+    <div class="quiz-card">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+        <button class="close-btn" id="quiz-close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+      </div>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+      </div>
+      <div class="quiz-question-number" id="quiz-question-number">Question 1 of 10</div>
+      <div class="quiz-question-text" id="quiz-question-text">Question text</div>
+      <div class="quiz-options" id="quiz-options">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ App Script ═══ -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
