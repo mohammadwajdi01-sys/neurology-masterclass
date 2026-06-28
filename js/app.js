@@ -316,6 +316,16 @@ class App {
         if (e.target === quizOverlay) this.study.closeQuiz();
       });
     }
+
+    const progressClose = document.getElementById('progress-close');
+    if (progressClose) progressClose.addEventListener('click', () => this.study.closeProgress());
+
+    const progressOverlay = document.getElementById('progress-overlay');
+    if (progressOverlay) {
+      progressOverlay.addEventListener('click', (e) => {
+        if (e.target === progressOverlay) this.study.closeProgress();
+      });
+    }
   }
 
   // ── User Info ─────────────────────────────────────────────

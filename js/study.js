@@ -130,7 +130,63 @@ export class StudyManager {
 
   showProgress() {
     const prog = this.getOverallProgress();
-    alert(`Progress: ${prog.completed}/${prog.total} topics completed (${prog.percentage}%)`);
+    
+    const completedVal = document.getElementById('progress-completed-value');
+    const percentVal = document.getElementById('progress-percent-value');
+    const progressFill = document.getElementById('progress-bar-fill-global');
+    const listContainer = document.getElementById('progress-topics-list');
+    
+    if (completedVal) completedVal.textContent = `${prog.completed} / ${prog.total}`;
+    if (percentVal) percentVal.textContent = `${prog.percentage}%`;
+    if (progressFill) progressFill.style.width = `${prog.percentage}%`;
+    
+    if (listContainer) {
+      listContainer.innerHTML = TOPICS.map((topic, i) => {
+        const status = this.getTopicProgress(topic.id);
+        const scoreData = this.quizScores[topic.id];
+        
+        let statusLabel = 'Not Started';
+        let statusClass = 'none';
+        if (status === 'completed') {
+          statusLabel = 'Completed';
+          statusClass = 'completed';
+        } else if (status === 'in-progress') {
+          statusLabel = 'In Progress';
+          statusClass = 'in-progress';
+        }
+        
+        const quizText = scoreData ? `<span class="progress-quiz-badge">Quiz: ${scoreData.score}/${scoreData.total}</span>` : '';
+        
+        return `
+          <div class="progress-topic-row" data-topic-id="${topic.id}">
+            <div class="progress-topic-row-left">
+              <div class="progress-status-dot ${statusClass}" title="${statusLabel}"></div>
+              <span class="progress-topic-name">${topic.number}. ${topic.title}</span>
+            </div>
+            <div class="progress-topic-row-right">
+              ${quizText}
+              <span style="font-size: var(--text-xs); color: var(--text-muted); font-weight: 500;">${statusLabel}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      listContainer.querySelectorAll('.progress-topic-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const topicId = row.dataset.topicId;
+          this.app.switchTopic(topicId);
+          this.closeProgress();
+        });
+      });
+    }
+    
+    const overlay = document.getElementById('progress-overlay');
+    if (overlay) overlay.classList.add('active');
+  }
+
+  closeProgress() {
+    const overlay = document.getElementById('progress-overlay');
+    if (overlay) overlay.classList.remove('active');
   }
 
   // ── Flashcards ────────────────────────────────────────────
@@ -415,6 +471,7 @@ export class StudyManager {
   closeAllOverlays() {
     this.closeFlashcards();
     this.closeQuiz();
+    this.closeProgress();
   }
 
   dispose() {
