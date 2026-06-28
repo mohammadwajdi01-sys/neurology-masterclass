@@ -76,6 +76,7 @@ class App {
     this.currentTopicId = topicId;
     this.currentTopic = topic;
 
+    const mainEl = document.querySelector('.main');
     const contentBody = document.getElementById('content-body');
 
     const doSwitch = () => {
@@ -86,12 +87,11 @@ class App {
       this.study.updateBookmarkUI(topicId);
       this.scrollManager.scrollToTop();
       this.scrollManager.observeContent();
-      this.animations.observeSections(contentBody);
-      // Reset scroll position in header scroll tracker (header is always visible now)
+      if (contentBody) this.animations.observeSections(contentBody);
     };
 
-    if (animate && contentBody) {
-      this.animations.animateTopicTransition(contentBody, doSwitch);
+    if (animate && mainEl) {
+      this.animations.animateTopicTransition(mainEl, doSwitch);
     } else {
       doSwitch();
     }

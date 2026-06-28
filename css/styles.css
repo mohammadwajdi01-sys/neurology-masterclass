@@ -229,8 +229,9 @@ body {
   display: flex;
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
+  overflow: hidden; /* sidebar stays clipped */
 }
+
 
 /* ── Sidebar ───────────────────────────────────────────────── */
 .sidebar {
@@ -559,11 +560,14 @@ body {
 /* ── Main Area ─────────────────────────────────────────────── */
 .main {
   flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   min-width: 0;
 }
+
 
 /* ── Illustration Viewport ─────────────────────────────────── */
 /*
@@ -917,12 +921,12 @@ body {
 
 /* ── Content Section ───────────────────────────────────────── */
 .content-section {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   background: var(--bg-secondary);
+  flex-shrink: 0;
 }
+
 
 /* Content Tabs */
 .content-tabs {
@@ -1032,10 +1036,9 @@ body {
 /* Content Body */
 .content-body {
   flex: 1;
-  overflow-y: auto;
   padding: var(--space-8) var(--space-8);
-  scroll-behavior: smooth;
 }
+
 
 .content-inner {
   max-width: var(--content-max-width);

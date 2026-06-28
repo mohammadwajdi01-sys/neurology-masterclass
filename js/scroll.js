@@ -14,7 +14,8 @@ export class ScrollManager {
   }
 
   init() {
-    this.contentBody = document.getElementById('content-body');
+    // Use the .main element as the scroll container (sticky header lives inside it)
+    this.contentBody = document.querySelector('.main') || document.getElementById('content-body');
     this.progressFill = document.getElementById('progress-fill');
 
     if (this.contentBody) {
