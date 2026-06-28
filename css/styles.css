@@ -572,28 +572,29 @@ body {
   image is always visible without cropping on any screen size.
 */
 .viewport-section {
-  /* Use aspect-ratio as the primary sizing strategy */
   width: 100%;
   aspect-ratio: 16 / 9;
-  /* Hard caps so it never gets too tall or too small */
   max-height: 58vh;
-  min-height: 240px;
+  min-height: 160px;
   position: relative;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .viewport-illustration-container {
   position: absolute;
   inset: 0;
+  bottom: 10px; /* leave room for resize handle */
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-secondary);
 }
+
 
 #hero-illustration {
   /* Fill width fully, let height scale proportionally */
@@ -632,41 +633,55 @@ body {
   letter-spacing: var(--tracking-wide);
 }
 
-/* Viewport Header — fixed full-width bar at top of main area, fades in on scroll */
+/* ── Viewport Header Bar — always visible, glassy, contains toolbar ── */
 .viewport-header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: calc(var(--sidebar-width) + env(safe-area-inset-left));
+  left: 0;
   right: 0;
-  height: 50px;
-  background: var(--header-pill-bg, rgba(9, 9, 11, 0.72));
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  height: 52px;
+  flex-shrink: 0;
+  background: rgba(9, 9, 11, 0.60);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-bottom: 1px solid var(--glass-border);
-  z-index: 150;
+  z-index: 200;
   display: flex;
   align-items: center;
-  padding: 0 var(--space-5);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--duration-normal) var(--ease-smooth),
-              left var(--duration-slow) var(--ease-out);
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  opacity: 1;
+  pointer-events: auto;
+  transition: background var(--duration-normal) var(--ease-smooth);
+  box-shadow: 0 1px 24px rgba(0,0,0,0.18);
 }
 
-.sidebar.collapsed ~ .main .viewport-header {
-  left: env(safe-area-inset-left);
+[data-theme="light"] .viewport-header {
+  background: rgba(255, 255, 255, 0.70);
+}
+
+.header-bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.header-bar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--glass-border);
+  margin: 0 var(--space-1);
 }
 
 .viewport-header-pill {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: none;
-  padding: 0;
-  max-width: 100%;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
+  overflow: hidden;
+  padding-left: var(--space-2);
 }
 
 .viewport-topic-title {
@@ -674,19 +689,68 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .viewport-topic-subtitle {
   font-size: var(--text-xs);
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   margin-top: 0;
-  max-width: 50vw;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: var(--leading-relaxed);
+  line-height: 1;
+  flex-shrink: 1;
 }
+
+.header-bar-right {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.header-resize-tip {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+/* ── Viewport Resize Handle ── */
+.viewport-resize-handle {
+  height: 10px;
+  width: 100%;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  transition: background var(--duration-fast) var(--ease-smooth);
+}
+
+.viewport-resize-handle:hover {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.resize-handle-grip {
+  width: 48px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--glass-border);
+  transition: background var(--duration-fast) var(--ease-smooth),
+              width var(--duration-fast) var(--ease-smooth);
+}
+
+.viewport-resize-handle:hover .resize-handle-grip {
+  background: var(--accent);
+  width: 64px;
+}
+
 
 /* Expand hint over illustration */
 .expand-hint {
@@ -711,42 +775,25 @@ body {
   transition: opacity 0.4s ease;
 }
 
-/* Floating Toolbar */
-.floating-toolbar {
-  position: fixed;
-  top: calc(env(safe-area-inset-top) + var(--space-3));
-  left: calc(env(safe-area-inset-left) + var(--space-3));
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  transition: left var(--duration-slow) var(--ease-out);
-}
-
-.sidebar:not(.collapsed) ~ .main .floating-toolbar {
-  left: calc(var(--sidebar-width) + env(safe-area-inset-left) + var(--space-3));
-}
-
+/* Toolbar Buttons (inside glassy header bar) */
 .toolbar-btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-md);
-  background: var(--bg-elevated);
-  backdrop-filter: blur(var(--glass-blur-heavy));
-  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
-  border: 1px solid var(--glass-border);
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--duration-fast) var(--ease-smooth);
-  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
 }
 
 .toolbar-btn:hover {
   background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
+  border-color: var(--glass-border);
   color: var(--text-primary);
   transform: scale(1.05);
 }
@@ -758,6 +805,9 @@ body {
 .toolbar-btn.active {
   background: var(--accent-muted);
   border-color: var(--accent);
+  color: var(--accent);
+}
+
   color: var(--accent-hover);
 }
 

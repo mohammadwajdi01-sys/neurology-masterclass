@@ -15,7 +15,7 @@ class App {
     this.currentTopicId = 'cva';
     this.currentTopic = TOPICS[0];
     this.labelsVisible = true;
-    this.sidebarVisible = true;
+    this.sidebarVisible = false; // Sidebar starts collapsed
     this.theme = localStorage.getItem('neuro-theme') || 'dark';
 
     this.navigation = null;
@@ -54,7 +54,7 @@ class App {
     this.setupSidebarToggle();
     this.setupThemeToggle();
     this.setupImageLightbox();
-    this.setupHeaderScrollFade();
+    this.setupViewportResize();
 
     // Load first topic
     this.switchTopic('cva', false);
@@ -85,12 +85,7 @@ class App {
       this.scrollManager.scrollToTop();
       this.scrollManager.observeContent();
       this.animations.observeSections(contentBody);
-      // Reset header opacity when switching topic
-      const header = document.getElementById('viewport-header');
-      if (header) {
-        header.style.opacity = '0';
-        header.style.pointerEvents = 'none';
-      }
+      // Reset scroll position in header scroll tracker (header is always visible now)
     };
 
     if (animate && contentBody) {
@@ -207,6 +202,10 @@ class App {
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-toggle');
 
+    // Apply initial collapsed state
+    if (sidebar) sidebar.classList.toggle('collapsed', !this.sidebarVisible);
+    if (toggleBtn) toggleBtn.classList.toggle('active', !this.sidebarVisible);
+
     if (toggleBtn && sidebar) {
       toggleBtn.addEventListener('click', () => {
         this.sidebarVisible = !this.sidebarVisible;
@@ -214,6 +213,51 @@ class App {
         toggleBtn.classList.toggle('active', !this.sidebarVisible);
       });
     }
+  }
+
+  // ── Viewport Resize Handle ────────────────────────────────
+  setupViewportResize() {
+    const handle = document.getElementById('viewport-resize-handle');
+    const section = document.getElementById('viewport-section');
+    if (!handle || !section) return;
+
+    let dragging = false;
+    let startY = 0;
+    let startH = 0;
+
+    const onStart = (clientY) => {
+      dragging = true;
+      startY = clientY;
+      startH = section.getBoundingClientRect().height;
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'ns-resize';
+    };
+
+    const onMove = (clientY) => {
+      if (!dragging) return;
+      const delta = clientY - startY;
+      const newH = Math.max(100, Math.min(window.innerHeight * 0.85, startH + delta));
+      section.style.height = `${newH}px`;
+      section.style.minHeight = 'unset';
+      section.style.maxHeight = 'unset';
+      section.style.aspectRatio = 'unset';
+    };
+
+    const onEnd = () => {
+      dragging = false;
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+
+    // Mouse events
+    handle.addEventListener('mousedown', (e) => { e.preventDefault(); onStart(e.clientY); });
+    document.addEventListener('mousemove', (e) => onMove(e.clientY));
+    document.addEventListener('mouseup', onEnd);
+
+    // Touch events
+    handle.addEventListener('touchstart', (e) => { onStart(e.touches[0].clientY); }, { passive: true });
+    document.addEventListener('touchmove', (e) => { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientY); } }, { passive: false });
+    document.addEventListener('touchend', onEnd);
   }
 
   // ── Theme Toggle (Dark / Light) ───────────────────────────
@@ -243,24 +287,7 @@ class App {
     }
   }
 
-  // ── Header Scroll Fade ────────────────────────────────────
-  setupHeaderScrollFade() {
-    const contentBody = document.getElementById('content-body');
-    const header = document.getElementById('viewport-header');
-    if (!contentBody || !header) return;
-
-    // Initially hidden
-    header.style.opacity = '0';
-    header.style.pointerEvents = 'none';
-
-    contentBody.addEventListener('scroll', () => {
-      const scrolled = contentBody.scrollTop;
-      // Fade IN header as user scrolls (fully visible at 100px)
-      const opacity = Math.min(1, scrolled / 100);
-      header.style.opacity = opacity;
-      header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-    }, { passive: true });
-  }
+  // (Header scroll fade removed — header bar is always visible)
 
   // ── Content Tabs (single tab) ─────────────────────────────
   setupContentTabs() {
