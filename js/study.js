@@ -199,6 +199,7 @@ export class StudyManager {
   flipFlashcard() {
     this.isFlashcardFlipped = !this.isFlashcardFlipped;
     const flashcard = document.getElementById('flashcard');
+    console.log('flipFlashcard called. New state:', this.isFlashcardFlipped, 'Flashcard element found:', !!flashcard);
     if (flashcard) flashcard.classList.toggle('flipped', this.isFlashcardFlipped);
   }
 

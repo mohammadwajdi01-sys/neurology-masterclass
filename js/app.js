@@ -279,7 +279,13 @@ class App {
   // ── Study UI ──────────────────────────────────────────────
   setupStudyUI() {
     const flashcard = document.getElementById('flashcard');
-    if (flashcard) flashcard.addEventListener('click', () => this.study.flipFlashcard());
+    if (flashcard) {
+      flashcard.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('Flashcard clicked! Flipped state before:', this.study.isFlashcardFlipped);
+        this.study.flipFlashcard();
+      });
+    }
 
     const flashcardPrev = document.getElementById('flashcard-prev');
     const flashcardNext = document.getElementById('flashcard-next');
