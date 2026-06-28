@@ -281,10 +281,13 @@ export class StudyManager {
     this.quizIndex = 0;
     this.quizScore = 0;
     this.quizAnswered = false;
+    this.quizUserAnswers = new Array(this.quizQuestions.length).fill(null);
 
     const overlay = document.getElementById('quiz-overlay');
     if (overlay) {
       overlay.classList.add('active');
+      const quizNav = document.getElementById('quiz-nav');
+      if (quizNav) quizNav.style.display = 'flex';
       this.renderQuizQuestion();
     }
   }
@@ -300,55 +303,91 @@ export class StudyManager {
     const questionText = document.getElementById('quiz-question-text');
     const optionsContainer = document.getElementById('quiz-options');
     const progressFill = document.getElementById('quiz-progress-fill');
+    const counter = document.getElementById('quiz-counter');
 
     if (questionNum) questionNum.textContent = `Question ${this.quizIndex + 1} of ${this.quizQuestions.length}`;
     if (questionText) questionText.textContent = q.question;
     if (progressFill) progressFill.style.width = `${((this.quizIndex + 1) / this.quizQuestions.length) * 100}%`;
+    if (counter) counter.textContent = `${this.quizIndex + 1} / ${this.quizQuestions.length}`;
 
     if (optionsContainer) {
       const letters = ['A', 'B', 'C', 'D'];
-      optionsContainer.innerHTML = q.options.map((opt, i) => `
-        <div class="quiz-option" data-index="${i}" data-correct="${opt === q.correct}">
-          <span class="quiz-option-letter">${letters[i]}</span>
-          <span>${opt}</span>
-        </div>
-      `).join('');
+      const chosenIndex = this.quizUserAnswers[this.quizIndex];
 
-      this.quizAnswered = false;
-      optionsContainer.querySelectorAll('.quiz-option').forEach(option => {
-        option.addEventListener('click', () => {
-          if (this.quizAnswered) return;
-          this.quizAnswered = true;
-
-          const isCorrect = option.dataset.correct === 'true';
-          if (isCorrect) this.quizScore++;
-
-          option.classList.add(isCorrect ? 'correct' : 'incorrect');
-
-          // Show correct answer
-          if (!isCorrect) {
-            optionsContainer.querySelector('[data-correct="true"]')?.classList.add('correct');
+      optionsContainer.innerHTML = q.options.map((opt, i) => {
+        let extraClass = '';
+        if (chosenIndex !== null) {
+          if (opt === q.correct) {
+            extraClass = 'correct';
+          } else if (i === chosenIndex) {
+            extraClass = 'incorrect';
           }
+        }
+        return `
+          <div class="quiz-option ${extraClass}" data-index="${i}" data-correct="${opt === q.correct}">
+            <span class="quiz-option-letter">${letters[i]}</span>
+            <span>${opt}</span>
+          </div>
+        `;
+      }).join('');
 
-          // Auto-advance
-          setTimeout(() => {
-            this.quizIndex++;
-            this.renderQuizQuestion();
-          }, 1200);
+      if (chosenIndex === null) {
+        optionsContainer.querySelectorAll('.quiz-option').forEach(option => {
+          option.addEventListener('click', () => {
+            if (this.quizUserAnswers[this.quizIndex] !== null) return;
+            const clickedIdx = parseInt(option.dataset.index);
+            this.quizUserAnswers[this.quizIndex] = clickedIdx;
+
+            const isCorrect = option.dataset.correct === 'true';
+            option.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            if (!isCorrect) {
+              optionsContainer.querySelector('[data-correct="true"]')?.classList.add('correct');
+            }
+
+            setTimeout(() => {
+              this.nextQuizQuestion();
+            }, 1200);
+          });
         });
-      });
+      }
+    }
+  }
+
+  nextQuizQuestion() {
+    if (this.quizIndex < this.quizQuestions.length - 1) {
+      this.quizIndex++;
+      this.renderQuizQuestion();
+    } else {
+      this.showQuizResults();
+    }
+  }
+
+  prevQuizQuestion() {
+    if (this.quizIndex > 0) {
+      this.quizIndex--;
+      this.renderQuizQuestion();
     }
   }
 
   showQuizResults() {
+    this.quizScore = this.quizUserAnswers.reduce((acc, ans, idx) => {
+      if (ans === null) return acc;
+      const q = this.quizQuestions[idx];
+      return acc + (q.options[ans] === q.correct ? 1 : 0);
+    }, 0);
+
     const questionNum = document.getElementById('quiz-question-number');
     const questionText = document.getElementById('quiz-question-text');
     const optionsContainer = document.getElementById('quiz-options');
     const progressFill = document.getElementById('quiz-progress-fill');
+    const quizNav = document.getElementById('quiz-nav');
 
     if (progressFill) progressFill.style.width = '100%';
     if (questionNum) questionNum.textContent = 'Quiz Complete!';
     if (questionText) questionText.textContent = '';
+    if (quizNav) quizNav.style.display = 'none';
+
     if (optionsContainer) {
       const percentage = Math.round((this.quizScore / this.quizQuestions.length) * 100);
       optionsContainer.innerHTML = `
@@ -359,7 +398,6 @@ export class StudyManager {
       `;
     }
 
-    // Save score
     this.quizScores[this.app.currentTopicId] = {
       score: this.quizScore,
       total: this.quizQuestions.length,

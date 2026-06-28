@@ -1394,7 +1394,8 @@ body {
   margin-top: var(--space-6);
 }
 
-.flashcard-nav-btn {
+.flashcard-nav-btn,
+.quiz-nav-btn {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-full);
@@ -1408,12 +1409,14 @@ body {
   transition: all var(--duration-fast) var(--ease-smooth);
 }
 
-.flashcard-nav-btn:hover {
+.flashcard-nav-btn:hover,
+.quiz-nav-btn:hover {
   background: var(--glass-bg-hover);
   color: var(--text-primary);
 }
 
-.flashcard-counter {
+.flashcard-counter,
+.quiz-counter {
   font-size: var(--text-sm);
   color: var(--text-tertiary);
   font-weight: 500;

@@ -295,7 +295,12 @@ class App {
     if (flashcardNext) flashcardNext.addEventListener('click', (e) => { e.stopPropagation(); this.study.nextFlashcard(); });
     if (flashcardClose) flashcardClose.addEventListener('click', () => this.study.closeFlashcards());
 
+    const quizPrev = document.getElementById('quiz-prev');
+    const quizNext = document.getElementById('quiz-next');
     const quizClose = document.getElementById('quiz-close');
+
+    if (quizPrev) quizPrev.addEventListener('click', (e) => { e.stopPropagation(); this.study.prevQuizQuestion(); });
+    if (quizNext) quizNext.addEventListener('click', (e) => { e.stopPropagation(); this.study.nextQuizQuestion(); });
     if (quizClose) quizClose.addEventListener('click', () => this.study.closeQuiz());
 
     const flashcardOverlay = document.getElementById('flashcard-overlay');
