@@ -56,7 +56,7 @@ export class Animations {
   // ── Click Feedback ────────────────────────────────────────
   setupClickFeedback() {
     document.addEventListener('pointerdown', (e) => {
-      const interactive = e.target.closest('button, .nav-item, .topic-item, .content-tab, .preset-btn, .control-btn, .quiz-option, .flashcard');
+      const interactive = e.target.closest('button, .nav-item, .topic-item, .content-tab, .preset-btn, .control-btn, .quiz-option, .flashcard-container');
       if (interactive && this.gsap) {
         this.gsap.to(interactive, {
           scale: 0.96,
@@ -67,7 +67,7 @@ export class Animations {
     });
 
     document.addEventListener('pointerup', (e) => {
-      const interactive = e.target.closest('button, .nav-item, .topic-item, .content-tab, .preset-btn, .control-btn, .quiz-option, .flashcard');
+      const interactive = e.target.closest('button, .nav-item, .topic-item, .content-tab, .preset-btn, .control-btn, .quiz-option, .flashcard-container');
       if (interactive && this.gsap) {
         this.gsap.to(interactive, {
           scale: 1,
