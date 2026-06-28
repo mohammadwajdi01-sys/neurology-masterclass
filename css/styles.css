@@ -2056,3 +2056,28 @@ body {
   background: var(--accent-muted);
   color: var(--accent-hover);
 }
+
+/* ── Image Toggle (Eye button) ── */
+.icon-eye-closed {
+  display: none;
+}
+
+/* When image is hidden: show closed eye, hide open eye, and collapse section */
+.viewport-section.image-hidden {
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  border-bottom: none;
+  overflow: hidden;
+  transition: height 0.3s var(--ease-smooth),
+              max-height 0.3s var(--ease-smooth);
+}
+
+#image-toggle.active .icon-eye-open {
+  display: none;
+}
+
+#image-toggle.active .icon-eye-closed {
+  display: block;
+}
+

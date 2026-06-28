@@ -54,7 +54,9 @@ class App {
     this.setupSidebarToggle();
     this.setupThemeToggle();
     this.setupImageLightbox();
+    this.setupImageToggle();
     this.setupViewportResize();
+
 
     // Load first topic
     this.switchTopic('cva', false);
@@ -215,7 +217,21 @@ class App {
     }
   }
 
+  // ── Image Visibility Toggle ───────────────────────────────
+  setupImageToggle() {
+    const btn = document.getElementById('image-toggle');
+    const section = document.getElementById('viewport-section');
+    if (!btn || !section) return;
+
+    btn.addEventListener('click', () => {
+      const hidden = section.classList.toggle('image-hidden');
+      btn.classList.toggle('active', hidden);
+      btn.title = hidden ? 'Show Illustration' : 'Hide Illustration';
+    });
+  }
+
   // ── Viewport Resize Handle ────────────────────────────────
+
   setupViewportResize() {
     const handle = document.getElementById('viewport-resize-handle');
     const section = document.getElementById('viewport-section');
