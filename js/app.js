@@ -87,7 +87,10 @@ class App {
       this.animations.observeSections(contentBody);
       // Reset header opacity when switching topic
       const header = document.getElementById('viewport-header');
-      if (header) header.style.opacity = '1';
+      if (header) {
+        header.style.opacity = '0';
+        header.style.pointerEvents = 'none';
+      }
     };
 
     if (animate && contentBody) {
@@ -246,10 +249,14 @@ class App {
     const header = document.getElementById('viewport-header');
     if (!contentBody || !header) return;
 
+    // Initially hidden
+    header.style.opacity = '0';
+    header.style.pointerEvents = 'none';
+
     contentBody.addEventListener('scroll', () => {
       const scrolled = contentBody.scrollTop;
-      // Fade out header as user scrolls (fully gone at 80px)
-      const opacity = Math.max(0, 1 - scrolled / 80);
+      // Fade IN header as user scrolls (fully visible at 100px)
+      const opacity = Math.min(1, scrolled / 100);
       header.style.opacity = opacity;
       header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
     }, { passive: true });
