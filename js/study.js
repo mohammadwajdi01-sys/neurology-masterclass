@@ -146,13 +146,27 @@ export class StudyManager {
         const scoreData = this.quizScores[topic.id];
         
         let statusLabel = 'Not Started';
-        let statusClass = 'none';
+        let checkboxHtml = '';
+        
         if (status === 'completed') {
           statusLabel = 'Completed';
-          statusClass = 'completed';
+          checkboxHtml = `
+            <div class="progress-status-checkbox completed" data-topic-id="${topic.id}" title="Mark as uncompleted" style="width: 20px; height: 20px; border-radius: var(--radius-full); border: 2px solid var(--success); background: var(--success); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all var(--duration-fast) var(--ease-smooth);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          `;
         } else if (status === 'in-progress') {
           statusLabel = 'In Progress';
-          statusClass = 'in-progress';
+          checkboxHtml = `
+            <div class="progress-status-checkbox in-progress" data-topic-id="${topic.id}" title="Mark as completed" style="width: 20px; height: 20px; border-radius: var(--radius-full); border: 2px solid var(--accent); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all var(--duration-fast) var(--ease-smooth);">
+              <div style="width: 8px; height: 8px; border-radius: var(--radius-full); background: var(--accent);"></div>
+            </div>
+          `;
+        } else {
+          checkboxHtml = `
+            <div class="progress-status-checkbox none" data-topic-id="${topic.id}" title="Mark as completed" style="width: 20px; height: 20px; border-radius: var(--radius-full); border: 2px solid var(--glass-border); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all var(--duration-fast) var(--ease-smooth);">
+            </div>
+          `;
         }
         
         const quizText = scoreData ? `<span class="progress-quiz-badge">Quiz: ${scoreData.score}/${scoreData.total}</span>` : '';
@@ -160,8 +174,8 @@ export class StudyManager {
         return `
           <div class="progress-topic-row" data-topic-id="${topic.id}">
             <div class="progress-topic-row-left">
-              <div class="progress-status-dot ${statusClass}" title="${statusLabel}"></div>
-              <span class="progress-topic-name">${topic.number}. ${topic.title}</span>
+              ${checkboxHtml}
+              <span class="progress-topic-name" style="margin-left: var(--space-1);">${topic.number}. ${topic.title}</span>
             </div>
             <div class="progress-topic-row-right">
               ${quizText}
@@ -176,6 +190,17 @@ export class StudyManager {
           const topicId = row.dataset.topicId;
           this.app.switchTopic(topicId);
           this.closeProgress();
+        });
+      });
+
+      listContainer.querySelectorAll('.progress-status-checkbox').forEach(box => {
+        box.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const topicId = box.dataset.topicId;
+          const currentStatus = this.getTopicProgress(topicId);
+          const newStatus = currentStatus === 'completed' ? 'none' : 'completed';
+          this.markTopicProgress(topicId, newStatus);
+          this.showProgress();
         });
       });
     }
@@ -447,11 +472,21 @@ export class StudyManager {
     if (optionsContainer) {
       const percentage = Math.round((this.quizScore / this.quizQuestions.length) * 100);
       optionsContainer.innerHTML = `
-        <div class="quiz-score">
+        <div class="quiz-score" style="display: flex; flex-direction: column; align-items: center; gap: var(--space-4);">
           <div class="quiz-score-value">${this.quizScore}/${this.quizQuestions.length}</div>
-          <div class="quiz-score-label">${percentage}% correct</div>
+          <div class="quiz-score-label" style="margin-bottom: var(--space-2);">${percentage}% correct</div>
+          <button class="nav-item active" id="quiz-retake-btn" style="width: auto; padding: var(--space-2) var(--space-6); border-radius: var(--radius-full); text-align: center; justify-content: center; font-weight: 600; display: inline-flex; align-items: center;">
+            Retake Quiz
+          </button>
         </div>
       `;
+
+      const retakeBtn = document.getElementById('quiz-retake-btn');
+      if (retakeBtn) {
+        retakeBtn.addEventListener('click', () => {
+          this.openQuiz(this.app.currentTopicId);
+        });
+      }
     }
 
     this.quizScores[this.app.currentTopicId] = {

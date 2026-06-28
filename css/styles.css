@@ -632,13 +632,11 @@ body {
   letter-spacing: var(--tracking-wide);
 }
 
-/* Viewport Header — pill style, fades on scroll */
+/* Viewport Header — pill style next to toggle, fades on scroll */
 .viewport-header {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-4) var(--space-5);
+  top: calc(env(safe-area-inset-top) + var(--space-3));
+  left: calc(env(safe-area-inset-left) + var(--space-3) + 40px + var(--space-3));
   z-index: 10;
   pointer-events: auto;
   transition: opacity 0.15s ease;
@@ -651,8 +649,12 @@ body {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
-  padding: var(--space-3) var(--space-5);
-  max-width: 90%;
+  padding: var(--space-2) var(--space-4);
+  max-width: calc(100vw - var(--sidebar-width) - 100px);
+}
+
+.sidebar.collapsed ~ .main .viewport-header-pill {
+  max-width: calc(100vw - 100px);
 }
 
 .viewport-topic-title {
