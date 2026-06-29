@@ -306,7 +306,6 @@ export class StudyManager {
     const topic = TOPICS.find(t => t.id === topicId);
     if (!topic) return [];
 
-    // Use curated data if available
     const curated = STUDY_DATA[topicId];
     if (curated && curated.quiz && curated.quiz.length > 0) {
       return curated.quiz.map(q => ({
@@ -363,22 +362,86 @@ export class StudyManager {
     this.quizScore = 0;
     this.quizAnswered = false;
     this.quizUserAnswers = new Array(this.quizQuestions.length).fill(null);
+    this.quizMode = this.quizMode || 'practice';
+    this.stopQuizTimer();
 
     const overlay = document.getElementById('quiz-overlay');
-    if (overlay) {
-      overlay.classList.add('active');
-      const quizNav = document.getElementById('quiz-nav');
-      if (quizNav) quizNav.style.display = 'flex';
-      this.renderQuizQuestion();
+    if (!overlay) return;
+    overlay.classList.add('active');
+
+    // Wire mode toggle buttons
+    document.querySelectorAll('.quiz-mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === this.quizMode);
+      btn.onclick = () => {
+        this.quizMode = btn.dataset.mode;
+        document.querySelectorAll('.quiz-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === this.quizMode));
+        this.openQuiz(this.app.currentTopicId);
+      };
+    });
+
+    // Timer: only in exam mode (1.5 min per question)
+    const timerEl = document.getElementById('quiz-timer');
+    if (this.quizMode === 'exam') {
+      this._quizTimeRemaining = this.quizQuestions.length * 90;
+      if (timerEl) timerEl.style.display = 'flex';
+      this.startQuizTimer();
+    } else {
+      if (timerEl) timerEl.style.display = 'none';
     }
+
+    // Submit row: only in exam mode
+    const submitRow = document.getElementById('quiz-submit-row');
+    if (submitRow) submitRow.style.display = this.quizMode === 'exam' ? 'flex' : 'none';
+
+    const quizNav = document.getElementById('quiz-nav');
+    if (quizNav) quizNav.style.display = 'flex';
+
+    const submitBtn = document.getElementById('quiz-submit-btn');
+    if (submitBtn) submitBtn.onclick = () => this.showQuizResults();
+
+    this.renderQuizQuestion();
+    if (this.quizMode === 'exam') this.renderQuestionGrid();
+  }
+
+  startQuizTimer() {
+    this.stopQuizTimer();
+    const display = document.getElementById('quiz-timer-display');
+    const timerEl = document.getElementById('quiz-timer');
+    this._quizTimerInterval = setInterval(() => {
+      this._quizTimeRemaining--;
+      const mins = Math.floor(this._quizTimeRemaining / 60);
+      const secs = this._quizTimeRemaining % 60;
+      if (display) display.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+      if (timerEl) timerEl.classList.toggle('quiz-timer-urgent', this._quizTimeRemaining <= 30);
+      if (this._quizTimeRemaining <= 0) { this.stopQuizTimer(); this.showQuizResults(); }
+    }, 1000);
+  }
+
+  stopQuizTimer() {
+    if (this._quizTimerInterval) { clearInterval(this._quizTimerInterval); this._quizTimerInterval = null; }
+  }
+
+  renderQuestionGrid() {
+    const grid = document.getElementById('quiz-question-grid');
+    if (!grid) return;
+    grid.style.display = 'flex';
+    grid.innerHTML = this.quizQuestions.map((_, i) => {
+      const answered = this.quizUserAnswers[i] !== null;
+      const isCurrent = i === this.quizIndex;
+      return `<button class="quiz-grid-btn${answered ? ' answered' : ''}${isCurrent ? ' current' : ''}" data-qi="${i}">${i + 1}</button>`;
+    }).join('');
+    grid.querySelectorAll('.quiz-grid-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.quizIndex = parseInt(btn.dataset.qi);
+        this.renderQuizQuestion();
+        this.renderQuestionGrid();
+      });
+    });
   }
 
   renderQuizQuestion() {
     const q = this.quizQuestions[this.quizIndex];
-    if (!q) {
-      this.showQuizResults();
-      return;
-    }
+    if (!q) { this.showQuizResults(); return; }
 
     const questionNum = document.getElementById('quiz-question-number');
     const questionText = document.getElementById('quiz-question-text');
@@ -394,41 +457,34 @@ export class StudyManager {
     if (optionsContainer) {
       const letters = ['A', 'B', 'C', 'D'];
       const chosenIndex = this.quizUserAnswers[this.quizIndex];
+      const isPractice = this.quizMode === 'practice';
 
       optionsContainer.innerHTML = q.options.map((opt, i) => {
-        let extraClass = '';
-        if (chosenIndex !== null) {
-          if (opt === q.correct) {
-            extraClass = 'correct';
-          } else if (i === chosenIndex) {
-            extraClass = 'incorrect';
-          }
+        let cls = '';
+        if (isPractice && chosenIndex !== null) {
+          if (opt === q.correct) cls = 'correct';
+          else if (i === chosenIndex) cls = 'incorrect';
         }
-        return `
-          <div class="quiz-option ${extraClass}" data-index="${i}" data-correct="${opt === q.correct}">
-            <span class="quiz-option-letter">${letters[i]}</span>
-            <span>${opt}</span>
-          </div>
-        `;
+        if (!isPractice && chosenIndex !== null && i === chosenIndex) cls = 'chosen';
+        return `<div class="quiz-option ${cls}" data-index="${i}" data-correct="${opt === q.correct}">
+          <span class="quiz-option-letter">${letters[i]}</span><span>${opt}</span></div>`;
       }).join('');
 
-      if (chosenIndex === null) {
+      if (chosenIndex === null || !isPractice) {
         optionsContainer.querySelectorAll('.quiz-option').forEach(option => {
           option.addEventListener('click', () => {
-            if (this.quizUserAnswers[this.quizIndex] !== null) return;
+            if (isPractice && this.quizUserAnswers[this.quizIndex] !== null) return;
             const clickedIdx = parseInt(option.dataset.index);
             this.quizUserAnswers[this.quizIndex] = clickedIdx;
-
-            const isCorrect = option.dataset.correct === 'true';
-            option.classList.add(isCorrect ? 'correct' : 'incorrect');
-
-            if (!isCorrect) {
-              optionsContainer.querySelector('[data-correct="true"]')?.classList.add('correct');
+            if (isPractice) {
+              const isCorrect = option.dataset.correct === 'true';
+              option.classList.add(isCorrect ? 'correct' : 'incorrect');
+              if (!isCorrect) optionsContainer.querySelector('[data-correct="true"]')?.classList.add('correct');
+              setTimeout(() => this.nextQuizQuestion(), 1200);
+            } else {
+              this.renderQuizQuestion();
+              this.renderQuestionGrid();
             }
-
-            setTimeout(() => {
-              this.nextQuizQuestion();
-            }, 1200);
           });
         });
       }
@@ -439,8 +495,9 @@ export class StudyManager {
     if (this.quizIndex < this.quizQuestions.length - 1) {
       this.quizIndex++;
       this.renderQuizQuestion();
+      if (this.quizMode === 'exam') this.renderQuestionGrid();
     } else {
-      this.showQuizResults();
+      if (this.quizMode === 'practice') this.showQuizResults();
     }
   }
 
@@ -448,56 +505,115 @@ export class StudyManager {
     if (this.quizIndex > 0) {
       this.quizIndex--;
       this.renderQuizQuestion();
+      if (this.quizMode === 'exam') this.renderQuestionGrid();
     }
   }
 
   showQuizResults() {
+    this.stopQuizTimer();
+    const total = this.quizQuestions.length;
     this.quizScore = this.quizUserAnswers.reduce((acc, ans, idx) => {
       if (ans === null) return acc;
-      const q = this.quizQuestions[idx];
-      return acc + (q.options[ans] === q.correct ? 1 : 0);
+      return acc + (this.quizQuestions[idx].options[ans] === this.quizQuestions[idx].correct ? 1 : 0);
     }, 0);
 
+    const answered = this.quizUserAnswers.filter(a => a !== null).length;
+    const pct = Math.round((this.quizScore / total) * 100);
+    const grade = pct === 100 ? 'A+' : pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
+    const gradeColor = ['A+','A'].includes(grade) ? '#22c55e' : grade === 'B' ? '#3b82f6' : grade === 'C' ? '#f59e0b' : '#ef4444';
+
+    const progressFill = document.getElementById('quiz-progress-fill');
     const questionNum = document.getElementById('quiz-question-number');
     const questionText = document.getElementById('quiz-question-text');
-    const optionsContainer = document.getElementById('quiz-options');
-    const progressFill = document.getElementById('quiz-progress-fill');
     const quizNav = document.getElementById('quiz-nav');
+    const quizGrid = document.getElementById('quiz-question-grid');
+    const submitRow = document.getElementById('quiz-submit-row');
+    const timerEl = document.getElementById('quiz-timer');
 
     if (progressFill) progressFill.style.width = '100%';
-    if (questionNum) questionNum.textContent = 'Quiz Complete!';
+    if (questionNum) questionNum.textContent = 'Results';
     if (questionText) questionText.textContent = '';
     if (quizNav) quizNav.style.display = 'none';
+    if (quizGrid) quizGrid.style.display = 'none';
+    if (submitRow) submitRow.style.display = 'none';
+    if (timerEl) timerEl.style.display = 'none';
 
+    const optionsContainer = document.getElementById('quiz-options');
     if (optionsContainer) {
-      const percentage = Math.round((this.quizScore / this.quizQuestions.length) * 100);
-      optionsContainer.innerHTML = `
-        <div class="quiz-score" style="display: flex; flex-direction: column; align-items: center; gap: var(--space-4);">
-          <div class="quiz-score-value">${this.quizScore}/${this.quizQuestions.length}</div>
-          <div class="quiz-score-label" style="margin-bottom: var(--space-2);">${percentage}% correct</div>
-          <button class="nav-item active" id="quiz-retake-btn" style="width: auto; padding: var(--space-2) var(--space-6); border-radius: var(--radius-full); text-align: center; justify-content: center; font-weight: 600; display: inline-flex; align-items: center;">
-            Retake Quiz
-          </button>
-        </div>
-      `;
+      const reportRows = this.quizQuestions.map((q, i) => {
+        const userAnsIdx = this.quizUserAnswers[i];
+        const userAns = userAnsIdx !== null ? q.options[userAnsIdx] : null;
+        const isCorrect = userAns === q.correct;
+        const verdict = userAns === null ? '⏭ Skipped' : isCorrect ? '✅ Correct' : '❌ Wrong';
+        const vc = userAns === null ? '#6b7280' : isCorrect ? '#22c55e' : '#ef4444';
+        return `<div class="quiz-report-row">
+          <div class="quiz-report-q">
+            <span class="quiz-report-num">Q${i+1}</span>
+            <span class="quiz-report-question">${q.question}</span>
+            <span class="quiz-report-verdict" style="color:${vc}">${verdict}</span>
+          </div>
+          <div class="quiz-report-answers">
+            ${userAns && !isCorrect ? `<div class="quiz-report-wrong">Your answer: ${userAns}</div>` : ''}
+            <div class="quiz-report-correct">Correct: ${q.correct}</div>
+          </div>
+        </div>`;
+      }).join('');
 
-      const retakeBtn = document.getElementById('quiz-retake-btn');
-      if (retakeBtn) {
-        retakeBtn.addEventListener('click', () => {
-          this.openQuiz(this.app.currentTopicId);
-        });
-      }
+      optionsContainer.innerHTML = `
+        <div class="quiz-results-header">
+          <div class="quiz-grade-badge" style="background:${gradeColor}20;color:${gradeColor};border:1px solid ${gradeColor}40">${grade}</div>
+          <div class="quiz-score-value">${this.quizScore}/${total}</div>
+          <div class="quiz-score-label">${pct}% &middot; ${answered}/${total} answered</div>
+          <button class="quiz-submit-btn" id="quiz-retake-btn" style="margin-top:var(--space-3)">Retake Quiz</button>
+        </div>
+        <div class="quiz-report-list">${reportRows}</div>`;
+
+      document.getElementById('quiz-retake-btn')?.addEventListener('click', () => this.openQuiz(this.app.currentTopicId));
+      if (pct === 100) this.launchConfetti();
     }
 
-    this.quizScores[this.app.currentTopicId] = {
-      score: this.quizScore,
-      total: this.quizQuestions.length,
-      date: new Date().toISOString()
-    };
+    this.quizScores[this.app.currentTopicId] = { score: this.quizScore, total, date: new Date().toISOString() };
     this.save('neuro-quiz', this.quizScores);
   }
 
+  // ── 🎉 Confetti on 100% ───────────────────────────────────
+  launchConfetti() {
+    const colors = ['#3b82f6','#6366f1','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#06b6d4'];
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;width:100%;height:100%;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = Array.from({ length: 180 }, () => ({
+      x: Math.random() * canvas.width, y: -20 - Math.random() * 120,
+      w: 8 + Math.random() * 8, h: 5 + Math.random() * 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 5, vy: 2.5 + Math.random() * 4,
+      angle: Math.random() * Math.PI * 2, spin: (Math.random() - 0.5) * 0.18, opacity: 1
+    }));
+    let frame = 0;
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+        if (frame > 100) p.opacity -= 0.01;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.opacity);
+        ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      frame++;
+      if (frame < 220 && pieces.some(p => p.opacity > 0)) requestAnimationFrame(animate);
+      else canvas.remove();
+    };
+    requestAnimationFrame(animate);
+  }
+
   closeQuiz() {
+    this.stopQuizTimer();
     const overlay = document.getElementById('quiz-overlay');
     if (overlay) overlay.classList.remove('active');
   }
@@ -510,6 +626,7 @@ export class StudyManager {
   }
 
   dispose() {
-    // Cleanup
+    this.stopQuizTimer();
   }
 }
+

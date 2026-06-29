@@ -52,6 +52,7 @@ export class Navigation {
 
       btn.addEventListener('click', () => {
         this.app.switchTopic(topic.id);
+        document.dispatchEvent(new CustomEvent('topic-selected'));
       });
 
       container.appendChild(btn);

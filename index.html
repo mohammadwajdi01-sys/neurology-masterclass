@@ -194,11 +194,12 @@
 
   <!-- ═══ Image Lightbox ═══ -->
   <div class="lightbox-overlay" id="lightbox-overlay">
-    <button class="lightbox-close" id="lightbox-close">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close image">
       <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
     <img class="lightbox-img" id="lightbox-img" src="" alt="Full view">
   </div>
+
 
   <!-- ═══ Search Overlay ═══ -->
   <div class="search-overlay" id="search-overlay">
@@ -246,19 +247,40 @@
   <!-- ═══ Quiz Overlay ═══ -->
   <div class="quiz-overlay" id="quiz-overlay">
     <div class="quiz-card">
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+
+      <!-- Header row: close + mode toggle + timer -->
+      <div class="quiz-header-row">
+        <div class="quiz-mode-toggle">
+          <button class="quiz-mode-btn active" id="quiz-mode-practice" data-mode="practice">Practice</button>
+          <button class="quiz-mode-btn" id="quiz-mode-exam" data-mode="exam">Exam</button>
+        </div>
+        <div class="quiz-timer" id="quiz-timer" aria-live="polite">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="quiz-timer-display">0:00</span>
+        </div>
         <button class="close-btn" id="quiz-close">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
         </button>
       </div>
+
+      <!-- Progress bar -->
       <div class="quiz-progress-bar">
         <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
       </div>
+
+      <!-- Question area -->
       <div class="quiz-question-number" id="quiz-question-number">Question 1 of 10</div>
       <div class="quiz-question-text" id="quiz-question-text">Question text</div>
       <div class="quiz-options" id="quiz-options">
         <!-- Dynamically populated -->
       </div>
+
+      <!-- Exam mode: question grid navigator -->
+      <div class="quiz-question-grid" id="quiz-question-grid" style="display:none;">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Navigation row -->
       <div class="quiz-nav" id="quiz-nav" style="display: flex; align-items: center; justify-content: center; gap: var(--space-4); margin-top: var(--space-6);">
         <button class="quiz-nav-btn" id="quiz-prev">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
@@ -268,8 +290,15 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
         </button>
       </div>
+
+      <!-- Exam mode: Submit button (hidden in practice mode) -->
+      <div class="quiz-submit-row" id="quiz-submit-row" style="display:none;">
+        <button class="quiz-submit-btn" id="quiz-submit-btn">Submit Exam</button>
+      </div>
+
     </div>
   </div>
+
 
   <!-- ═══ Progress Overlay ═══ -->
   <div class="progress-overlay" id="progress-overlay">

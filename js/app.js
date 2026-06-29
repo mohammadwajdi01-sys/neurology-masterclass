@@ -172,7 +172,8 @@ class App {
     const closeBtn = document.getElementById('lightbox-close');
 
     const openLightbox = () => {
-      if (!heroImage.src || heroImage.style.opacity === '0') return;
+      // Use naturalWidth — reliable check that image is actually loaded
+      if (!heroImage || !heroImage.src || heroImage.naturalWidth === 0) return;
       lightboxImg.src = heroImage.src;
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -208,13 +209,42 @@ class App {
     if (sidebar) sidebar.classList.toggle('collapsed', !this.sidebarVisible);
     if (toggleBtn) toggleBtn.classList.toggle('active', !this.sidebarVisible);
 
+    // Mobile backdrop — tapping outside sidebar closes it
+    let backdrop = document.getElementById('sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'sidebar-backdrop';
+      backdrop.className = 'sidebar-backdrop';
+      document.body.appendChild(backdrop);
+    }
+
+    const openSidebar = () => {
+      this.sidebarVisible = true;
+      sidebar.classList.remove('collapsed');
+      toggleBtn.classList.remove('active');
+      if (window.innerWidth <= 1024) backdrop.classList.add('active');
+    };
+
+    const closeSidebar = () => {
+      this.sidebarVisible = false;
+      sidebar.classList.add('collapsed');
+      toggleBtn.classList.add('active');
+      backdrop.classList.remove('active');
+    };
+
+    backdrop.addEventListener('click', closeSidebar);
+
     if (toggleBtn && sidebar) {
       toggleBtn.addEventListener('click', () => {
-        this.sidebarVisible = !this.sidebarVisible;
-        sidebar.classList.toggle('collapsed', !this.sidebarVisible);
-        toggleBtn.classList.toggle('active', !this.sidebarVisible);
+        if (this.sidebarVisible) closeSidebar();
+        else openSidebar();
       });
     }
+
+    // Auto-close sidebar on mobile when a topic is selected
+    document.addEventListener('topic-selected', () => {
+      if (window.innerWidth <= 1024 && this.sidebarVisible) closeSidebar();
+    });
   }
 
   // ── Image Visibility Toggle ───────────────────────────────
