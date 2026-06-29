@@ -1845,8 +1845,8 @@ body {
   .sidebar {
     position: fixed;
     left: 0;
-    top: 0;
-    height: 100vh;
+    top: 52px;
+    height: calc(100vh - 52px);
     z-index: 500;
     box-shadow: var(--shadow-xl);
   }
@@ -1870,7 +1870,10 @@ body {
   /* Sidebar backdrop — dims content when sidebar is open on mobile */
   .sidebar-backdrop {
     position: fixed;
-    inset: 0;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(2px);
     z-index: 450;
@@ -1882,11 +1885,6 @@ body {
   .sidebar-backdrop.active {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  /* Sidebar must be above the backdrop but below the header's toggle button */
-  .sidebar {
-    z-index: 500;
   }
 
   /* Header bar must be above sidebar on mobile so toggle is always reachable */

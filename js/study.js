@@ -379,10 +379,10 @@ export class StudyManager {
       };
     });
 
-    // Timer: only in exam mode (1.5 min per question)
+    // Timer: only in exam mode (3 minutes flat for all topics)
     const timerEl = document.getElementById('quiz-timer');
     if (this.quizMode === 'exam') {
-      this._quizTimeRemaining = this.quizQuestions.length * 90;
+      this._quizTimeRemaining = 180; // 3 minutes flat
       if (timerEl) timerEl.style.display = 'flex';
       this.startQuizTimer();
     } else {
