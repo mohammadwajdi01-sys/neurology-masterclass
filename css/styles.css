@@ -812,9 +812,6 @@ body {
   color: var(--accent);
 }
 
-  color: var(--accent-hover);
-}
-
 /* Image Lightbox */
 .lightbox-overlay {
   position: fixed;
@@ -828,12 +825,14 @@ body {
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s var(--ease-smooth);
+  visibility: hidden;
+  transition: opacity 0.3s var(--ease-smooth), visibility 0.3s var(--ease-smooth);
 }
 
 .lightbox-overlay.active {
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
 }
 
 .lightbox-img {
